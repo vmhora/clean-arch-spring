@@ -25,6 +25,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import br.com.victor.cleanarch.domain.Usuario;
 import br.com.victor.cleanarch.domain.exception.LoginExistenteException;
+import br.com.victor.cleanarch.domain.exception.UsuarioNotFoudException;
 import br.com.victor.cleanarch.domain.usecase.CreateUsuarioUseCase;
 import br.com.victor.cleanarch.domain.usecase.UpdateUsuarioUseCase;
 import br.com.victor.cleanarch.infra.entrypoint.exception.NotFoundException;
@@ -165,7 +166,7 @@ class UsuarioControllerTest {
 		Long usuarioId = 1L;
 		UsuarioUpdateRequest usuarioUpdateRequest = new UsuarioUpdateRequest("victor", "vhora", "vmshora@gmail.com", false);
 
-		BDDMockito.given(updateUsuarioUseCase.execute(usuarioId,usuarioUpdateRequest.toDomain())).willThrow(new NotFoundException("usuario não encontrado"));
+		BDDMockito.given(updateUsuarioUseCase.execute(usuarioId,usuarioUpdateRequest.toDomain())).willThrow(new UsuarioNotFoudException("usuario não encontrado"));
 		
 		String json = new ObjectMapper().writeValueAsString(usuarioUpdateRequest);
 		

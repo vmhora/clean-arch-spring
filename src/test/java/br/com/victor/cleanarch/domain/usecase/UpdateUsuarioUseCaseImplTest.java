@@ -45,6 +45,25 @@ UsuarioRepositoryService usuarioRepositoryService = mock(UsuarioRepositoryServic
 	}
 	
 	@Test
+	@DisplayName("deve atualizar um usuário")
+	void updateUsuarioParaInativarTest() {
+		Long usuarioId = 1L;
+		LocalDate dtCadastro = LocalDate.now();
+		UsuarioUpdateRequest usuarioUpdateRequest = new UsuarioUpdateRequest("victor", "vhora", "vmshora@gmail.com", false);
+		
+		Usuario usuarioExistente = new Usuario(1L, "victor", "vhora", "vmshora@gmail.com", true, dtCadastro);
+		Usuario usuarioModificado = new Usuario(1L, "victor", "vhora", "vmshora@gmail.com", false, dtCadastro);
+		
+		when(usuarioRepositoryService.getById(usuarioId)).thenReturn(usuarioExistente);
+		when(usuarioRepositoryService.getByLogin("vhora")).thenReturn(usuarioExistente);
+		when(usuarioRepositoryService.save(usuarioModificado)).thenReturn(usuarioModificado);
+		
+		Usuario usuarioAtualizado = updateUsuarioUseCase.execute(usuarioId, usuarioUpdateRequest.toDomain());
+		
+		 assertEquals(usuarioModificado, usuarioAtualizado);
+	}
+	
+	@Test
 	@DisplayName("deve retornar um LoginExistenteException ao tentar atualizar um usuário com um login já existente")
 	void updateUsuarioComLoginExistenteTest() {
 		Long usuarioId = 2L;
