@@ -41,8 +41,8 @@ class CreateUsuarioUseCaseImplTest {
 	@DisplayName("deve retornar um LoginExistenteException ao tentar cadastrar um usuário com um login já existente")
 	public void createUsuarioComLoginExistenteTest() {
 		Usuario usuario = new Usuario("victor", "vhora", "vmshora@gmail.com");
-		
-		when(usuarioRepositoryService.getByLogin("vhora")).thenThrow(new LoginExistenteException("login já está em uso"));
+		Usuario usuarioExistente = new Usuario(1L, "victor", "vhora", "vmshora@gmail.com", true, LocalDate.now());
+		when(usuarioRepositoryService.getByLogin("vhora")).thenReturn(usuarioExistente);
 		
 		LoginExistenteException exception = assertThrows(LoginExistenteException.class, () -> createUsuarioUseCase.execute(usuario));
 		
