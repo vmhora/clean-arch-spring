@@ -1,0 +1,22 @@
+spring:
+  h2:
+    console:
+      enabled: true
+      path: /h2
+  datasource:
+    url: jdbc:h2:mem:test
+    username: sa
+    password:
+    driverClassName: org.h2.Driver
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    show-sql: true
+    hibernate:
+      ddl-auto: create
+      
+springdoc:
+  swagger-ui: 
+    path: /openapi/swagger-ui.html
+  api-docs: 
+    path: /openapi/v3/api-docs
+  packagesToScan: br.com.victor.cleanarch.infra.entrypoint
