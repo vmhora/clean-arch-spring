@@ -16,6 +16,7 @@
 	<properties>
 		<java.version>11</java.version>
 		<springdoc-openapi-ui.version>1.6.6</springdoc-openapi-ui.version>
+		 <jacoco.version>0.8.7</jacoco.version>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -77,6 +78,60 @@
 					</excludes>
 				</configuration>
 			</plugin>
+			<plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>${jacoco.version}</version>
+                <configuration>
+                    <excludes>
+                     	<exclude>br/com/victor/cleanarch/CleanArchSpringApplication.class</exclude>
+                        <exclude>br/com/victor/cleanarch/domain/Usuario.class</exclude>
+                        <exclude>br/com/victor/cleanarch/infra/entrypoint/resource/**</exclude>
+                        <exclude>br/com/victor/cleanarch/infra/entrypoint/exception/**</exclude>
+                        <exclude>br/com/victor/cleanarch/infra/entrypoint/handler/**</exclude>
+                        <exclude>br/com/victor/cleanarch/infra/persistense/entity/**</exclude>
+                        <exclude>br/com/victor/cleanarch/infra/persistense/converter/**</exclude>
+                        <exclude>br/com/victor/cleanarch/configuration/**</exclude> 
+                    </excludes>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>prepare-agent</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>jacoco-report</id>
+                        <phase>test</phase>
+                        <goals>
+                            <goal>report</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>target/jacoco-report</outputDirectory>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>jacoco-check</id>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                        <configuration>
+                            <rules>
+                                <rule>
+                                    <element>PACKAGE</element>
+                                    <limits>
+                                        <limit>
+                                            <counter>LINE</counter>
+                                            <value>COVEREDRATIO</value>
+                                            <minimum>0.8</minimum>
+                                        </limit>
+                                    </limits>
+                                </rule>
+                            </rules>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
 		</plugins>
 	</build>
 
