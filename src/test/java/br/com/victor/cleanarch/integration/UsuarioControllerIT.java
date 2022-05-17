@@ -1,4 +1,4 @@
-package br.com.victor.cleanarch.Integration;
+package br.com.victor.cleanarch.integration;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
