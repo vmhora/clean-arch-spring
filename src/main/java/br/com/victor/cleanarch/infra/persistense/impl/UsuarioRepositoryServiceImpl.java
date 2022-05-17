@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import br.com.victor.cleanarch.domain.Usuario;
 import br.com.victor.cleanarch.domain.ports.UsuarioRepositoryService;
@@ -12,6 +13,7 @@ import br.com.victor.cleanarch.infra.persistense.entity.UsuarioEntity;
 import br.com.victor.cleanarch.infra.persistense.repository.UsuarioRepository;
 
 @Component
+@Transactional
 public class UsuarioRepositoryServiceImpl implements UsuarioRepositoryService{
 	
 	private final UsuarioRepository usuarioRepository;
@@ -23,6 +25,7 @@ public class UsuarioRepositoryServiceImpl implements UsuarioRepositoryService{
 	}
 
 	@Override
+	@Transactional
 	public Usuario save(Usuario usuario) {
 		UsuarioEntity usuarioEntity = usuarioRepositoryConverter.mapToTable(usuario);
 		return usuarioRepositoryConverter.mapToEntity(usuarioRepository.save(usuarioEntity));

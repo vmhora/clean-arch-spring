@@ -35,7 +35,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         		NotFoundExceptionDetails.builder()
                         .timestamp(LocalDateTime.now())
                         .status(HttpStatus.NOT_FOUND.value())
-                        .title("Objec not found")
+                        .title("Object not found")
                         .details(nfe.getMessage())
                         .developerMessage(nfe.getClass().getName())
                         .build(), HttpStatus.NOT_FOUND);
