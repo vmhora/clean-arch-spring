@@ -4,19 +4,22 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.time.LocalDate;
+import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.web.server.LocalServerPort;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.annotation.DirtiesContext.ClassMode;
 
 import br.com.victor.cleanarch.domain.Usuario;
 import br.com.victor.cleanarch.domain.ports.UsuarioRepositoryService;
@@ -25,7 +28,7 @@ import br.com.victor.cleanarch.infra.entrypoint.resource.UsuarioResponse;
 import br.com.victor.cleanarch.infra.entrypoint.resource.UsuarioUpdateRequest;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@AutoConfigureTestDatabase
+@DirtiesContext(classMode = ClassMode.BEFORE_EACH_TEST_METHOD)
 class UsuarioControllerIT {
 
 	static String USUARIO_API = "/api/v1/usuarios";
@@ -116,7 +119,7 @@ class UsuarioControllerIT {
 	}
 	
 	@Test
-	@DisplayName("deve retornar um UsuarioNotFoudException ao tentar atualizar um usuário inexistente na base")
+	@DisplayName("deve retornar um NotFoundException ao tentar atualizar um usuário inexistente na base")
 	void updateUsuarioInexistenteTest() {
 		UsuarioUpdateRequest usuarioUpdateRequest = new UsuarioUpdateRequest("victor medrado", "vhora", "victor.hora@gmail.com", false);
 
@@ -125,6 +128,31 @@ class UsuarioControllerIT {
 
 		assertThat(usuarioResponseError.getBody().getId()).isNull();
 		assertEquals(usuarioResponseError.getStatusCode(), HttpStatus.NOT_FOUND);
+
+	}
+	
+	@Test
+	@DisplayName("deve retornar todos os usuários cadastrados na base")
+	void getAllUsuariosTest() {
+		usuarioRepositoryService.save(usuario);
+
+		ResponseEntity<List<UsuarioResponse>> usuarioResponse = this.testRestTemplate.exchange(USUARIO_API,
+				HttpMethod.GET, null, new ParameterizedTypeReference<List<UsuarioResponse>>() {});
+
+		assertThat(usuarioResponse.getBody()).isNotEmpty();
+		assertEquals(usuarioResponse.getStatusCode(), HttpStatus.OK);
+
+	}
+	
+	@Test
+	@DisplayName("deve retornar um NotFoundException ao tentar buscar todos os usuários da base")
+	void getAllUsuariosInexistentesTest() {
+
+		ResponseEntity<String> usuarioResponse = this.testRestTemplate.exchange(USUARIO_API,
+				HttpMethod.GET, null, String.class);
+
+		assertThat(usuarioResponse.getBody()).isNotEmpty();
+		assertEquals(usuarioResponse.getStatusCode(), HttpStatus.NOT_FOUND);
 
 	}
 }

@@ -3,6 +3,7 @@ package br.com.victor.cleanarch.infra.entrypoint;
 import static org.hamcrest.CoreMatchers.containsString;
 
 import java.time.LocalDate;
+import java.util.List;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -27,8 +28,8 @@ import br.com.victor.cleanarch.domain.Usuario;
 import br.com.victor.cleanarch.domain.exception.LoginExistenteException;
 import br.com.victor.cleanarch.domain.exception.UsuarioNotFoudException;
 import br.com.victor.cleanarch.domain.usecase.CreateUsuarioUseCase;
+import br.com.victor.cleanarch.domain.usecase.GetAllUsuariosUseCase;
 import br.com.victor.cleanarch.domain.usecase.UpdateUsuarioUseCase;
-import br.com.victor.cleanarch.infra.entrypoint.exception.NotFoundException;
 import br.com.victor.cleanarch.infra.entrypoint.resource.UsuarioCreateRequest;
 import br.com.victor.cleanarch.infra.entrypoint.resource.UsuarioUpdateRequest;
 
@@ -48,6 +49,9 @@ class UsuarioControllerTest {
 	
 	@MockBean
 	UpdateUsuarioUseCase updateUsuarioUseCase;
+	
+	@MockBean
+	GetAllUsuariosUseCase getAllUsuariosUseCase;
 	
 	@Test
 	@DisplayName("deve criar um usuário")
@@ -180,6 +184,55 @@ class UsuarioControllerTest {
 		.perform(request)
 		.andExpect(MockMvcResultMatchers.status().isNotFound())
 		.andExpect(MockMvcResultMatchers.jsonPath("details", containsString("usuario não encontrado")));
+		
+	}
+	
+	@Test
+	@DisplayName("deve retornar todos os usuários cadastrados na base")
+	public void getAllUsuariosTest() throws Exception {
+		
+		LocalDate dtCadastro = LocalDate.now();
+		Usuario usuarioCadastrado = new Usuario(1L, "victor", "vhora", "vmshora@gmail.com", true, dtCadastro);
+		List<Usuario> usuariosCadastrados = List.of(usuarioCadastrado);
+
+		BDDMockito.given(getAllUsuariosUseCase.execute()).willReturn(usuariosCadastrados);
+		
+		
+		MockHttpServletRequestBuilder request = MockMvcRequestBuilders
+				.get(USUARIO_API)
+				.contentType(MediaType.APPLICATION_JSON)
+				.accept(MediaType.APPLICATION_JSON);
+				
+
+		mvc
+			.perform(request)
+			.andExpect(MockMvcResultMatchers.status().isOk())
+			.andExpect(MockMvcResultMatchers.jsonPath("$.[0]id").value(usuarioCadastrado.getId()))
+			.andExpect(MockMvcResultMatchers.jsonPath("$.[0]nome").value(usuarioCadastrado.getNome()))
+			.andExpect(MockMvcResultMatchers.jsonPath("$.[0]login").value(usuarioCadastrado.getLogin()))
+			.andExpect(MockMvcResultMatchers.jsonPath("$.[0]email").value(usuarioCadastrado.getEmail()))
+			.andExpect(MockMvcResultMatchers.jsonPath("$.[0]ativo").value(usuarioCadastrado.isAtivo()))
+			.andExpect(MockMvcResultMatchers.jsonPath("$.[0]dtCadastro").isNotEmpty());
+		
+	}
+	
+	@Test
+	@DisplayName("deve retornar um UsuarioNotFoudException ao tentar buscar todos os usuários da base")
+	public void getAllUsuariosInexistentesTest() throws Exception {
+		
+		BDDMockito.given(getAllUsuariosUseCase.execute()).willThrow(new UsuarioNotFoudException("nenhum usuário encontrado"));
+		
+		
+		MockHttpServletRequestBuilder request = MockMvcRequestBuilders
+				.get(USUARIO_API)
+				.contentType(MediaType.APPLICATION_JSON)
+				.accept(MediaType.APPLICATION_JSON);
+				
+
+		mvc
+			.perform(request)
+			.andExpect(MockMvcResultMatchers.status().isNotFound())
+			.andExpect(MockMvcResultMatchers.jsonPath("details", containsString("nenhum usuário encontrado")));
 		
 	}
 }
